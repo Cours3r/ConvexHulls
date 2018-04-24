@@ -6,11 +6,6 @@ import numpy.random as npr
 num = 75
 filename = "points.txt"
 
-def genPoint():
-	x = randint(-100,100)
-	y = randint(-100,100)
-	return (x,y)
-
 def genPointArr(size):
 	pointArr = []
 	while len(pointArr) < size:
@@ -18,15 +13,20 @@ def genPointArr(size):
 	return pointArr
 
 def getNormalArr(mu,sigma,size):
-	a = npr.normal(mu,sigman(2,size))
+	a = npr.normal(mu,sigma,(size,2))
 	out = []
 	for coord in a:
 		out.append((coord[0],coord[1]))
 	return out
-	
-with open(filename,"w") as f:
-	for p in pointArr:
-		f.write("{0},{1}\n".format(p[0],p[1]))
 
+def main():
+	m = 0
+	sd = 8
+	s = 5
+	arr = getNormalArr(m,sd,s)
+	with open(filename,"w") as f:
+		for p in arr:
+			f.write("{0},{1}\n".format(p[0],p[1]))
 
-
+if __name__ == "__main__":
+	main()

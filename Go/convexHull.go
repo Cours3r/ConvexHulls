@@ -1,21 +1,34 @@
 package main
 
-import ("fmt")
+import ("fmt"
+		"math"
+		"encoding/csv")
 
 /*
 Functions:
 
-1 - getVec(a,b) // return a -> b
-2 - mag(v) // return magnitude
-3 - cross(v1,v2) // return v1[0]*v2[1] - v1[1]*v2[0]
-4 - isLeft(a,b,origin)
+1 x getVec(a,b) // return a -> b
+2 x mag(v) // return magnitude
+3 x cross(v1,v2) // return v1[0]*v2[1] - v1[1]*v2[0]
+4 x isLeft(a,b,origin)
 5 - sortByAngle(pList,origin)
-6 - hull(pList
+6 - hull(pList)
  */
 
-/*
-Point struct?
- */
+func readInData(filename string) {
+	r := csv.NewReader(strings.NewReader(filename))
+	for {
+		point,err := r.read()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(point)
+		}
+	}
+}
+
 
 type Point struct {
 	X float64
@@ -23,8 +36,8 @@ type Point struct {
 }
 
 type Vec struct {
-	X float64
-	Y float64
+	i float64
+	j float64
 }
 
 func getVec(a,b Point) Vec {
@@ -35,11 +48,47 @@ func getVec(a,b Point) Vec {
 	return vec
 }
 
+func mag(v Vec) float64 {
+	return math.Sqrt(math.Pow(v.i,2)+math.Pow(v.j,2))
+}
+
+func cross(v1,v2 Vec) float64 {
+	return v1.i*v2.j - v1.j*v2.i
+}
+
+func isLeft(a,b,origin Point) bool {
+	v1 := getVec(origin,a)
+	v2 := getVec(origin,b)
+	crossProd := cross(v1,v2)
+	if crossProd > 0 {
+		return false
+	} else if crossProd < 0 {
+		return true
+	} else {
+		if mag(v1) > mag(v2) {
+			return false
+		} else {
+			return true
+		}
+	}
+}
+
+
+
 func main() {
 	a := Point{1,2}
 	b := Point{5,6}
-	fmt.Println(a)
-	fmt.Println(b)
+	c := Point{-5,4}
+	fmt.Println("Point A: ",a)
+	fmt.Println("Point B: ",b)
 	v := getVec(a,b)
-	fmt.Println(v)
+	fmt.Println("Vector V: <",v.i,v.j,">")
+	fmt.Println("Magnitude of V: ",mag(v))
+	w := getVec(a,c)
+	fmt.Println("Vector W: <",w.i,w.j,">")
+	fmt.Println("VxW: ",cross(v,w))
+	o := Point{0,0}
+	fmt.Println("A is left of B around origin: ",isLeft(a,b,o))
+	fn := "../points.txt"
+	readInData(fn)
 }
