@@ -18,14 +18,28 @@ Point struct?
  */
 
 type Point struct {
-	X int
-	Y int
+	X float64
+	Y float64
 }
 
-func add(x,y int) int {
-	return x + y
+type Vec struct {
+	X float64
+	Y float64
+}
+
+func getVec(a,b Point) Vec {
+	// returns vector a -> b
+	iComp := b.X - a.X
+	jComp := b.Y - a.Y
+	vec := Vec{iComp,jComp}
+	return vec
 }
 
 func main() {
-	fmt.Println(add(12,11))
+	a := Point{1,2}
+	b := Point{5,6}
+	fmt.Println(a)
+	fmt.Println(b)
+	v := getVec(a,b)
+	fmt.Println(v)
 }
