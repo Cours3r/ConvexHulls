@@ -22,7 +22,7 @@ def isleft(a,b,origin):
 	# test if a is to the left of b
 	A = getVec(origin,a)
 	B = getVec(origin,b)
-	crossPod = cross(A,B) 
+	crossPod = cross(A,B)
 	if crossPod > 0:
 		return False
 	elif crossPod < 0:
@@ -57,8 +57,7 @@ def ccw(p,c,n):
 	else:
 		return False
 
-def hull(points):	
-	tic = time.time()
+def hull(points):
 	## Get start point, lowest y and corresponding x
 	start = points[0]
 	ind = 0
@@ -71,11 +70,9 @@ def hull(points):
 				start = points[i]
 				ind = i
 	points.pop(ind)
-
 	## Sort by polar angle
 	angleSorted = sortByAngle(points,start)
 	storage = angleSorted.copy()
-
 	## Calculate the path
 	path = [start,angleSorted.pop(0),angleSorted.pop(0)]
 	if not ccw(path[0],path[1],path[2]):
@@ -83,37 +80,9 @@ def hull(points):
 	while angleSorted:
 		path.append(angleSorted.pop(0))
 		while not ccw(path[-3],path[-2],path[-1]):
-			path.pop(-2)	
+			path.pop(-2)
+	return path,start,storage
 
-	## Calculate time taken
-	elapsed = time.time() - tic
-
-	## Draw the diagram
-	chart = plt.figure()
-	plt.axhline(0,color="black",linewidth=.5)
-	plt.axvline(0,color="black",linewidth=.5)
-	pathInd = ["start"]
-	for node in range(0,len(storage)):
-		if storage[node] in path:
-			pathInd.append(node)
-		else:
-			plt.plot(storage[node][0],storage[node][1],"o")
-		plt.annotate(str(node),xy=(storage[node][0],storage[node][1]+.25))
-		plt.plot(start[0],start[1],"^")
-	plt.annotate("start",xy=(start[0],start[1]+.25))
-	for i in range(0,len(path)):
-		if i == len(path)-1:
-			j = 0
-		else:
-			j = i+1
-		plt.plot([path[i][0],path[j][0]],[path[i][1],path[j][1]],marker="^")	
-	
-	## Report Results
-	#print("Path: ",path)
-	print("PathInd: ",pathInd)
-	print("Length: ",len(pathInd))
-	print("Time: ",elapsed)
-	plt.show()
 
 def genPoint(low,high):
 	x = randint(low,high)
@@ -134,18 +103,39 @@ def getNormalArr(mu,sigma,size):
 	return out
 
 def main():
-	#s = 75
-	#l = -25
-	#h = 125
-	#arr = genPointArr(l,h,s)
 	m = 0
 	sd = 8
 	s = 125
 	arr = getNormalArr(m,sd,s)
-	hull(arr)
+	tic = time.time()
+	outSidePath,origin,storage = hull(arr)
+	## Calculate time taken
+	elapsed = time.time() - tic
+	## Draw the diagram
+	chart = plt.figure()
+	plt.axhline(0,color="black",linewidth=.5)
+	plt.axvline(0,color="black",linewidth=.5)
+	pathInd = ["start"]
+	for node in range(0,len(storage)):
+		if storage[node] in outSidePath:
+			pathInd.append(node)
+		else:
+			plt.plot(storage[node][0],storage[node][1],"o")
+		plt.annotate(str(node),xy=(storage[node][0],storage[node][1]+.25))
+		plt.plot(origin[0],origin[1],"^")
+	plt.annotate("start",xy=(origin[0],origin[1]+.25))
+	for i in range(0,len(outSidePath)):
+		if i == len(outSidePath)-1:
+			j = 0
+		else:
+			j = i+1
+		plt.plot([outSidePath[i][0],outSidePath[j][0]],[outSidePath[i][1],outSidePath[j][1]],marker="^")
+
+	## Report Results
+	print("PathInd: ",pathInd)
+	print("Length: ",len(pathInd))
+	print("Time: ",elapsed)
+	plt.show()
 
 if __name__ == "__main__":
 	main()
-
-
-
