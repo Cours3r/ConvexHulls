@@ -2,7 +2,11 @@ package main
 
 import ("fmt"
 		"math"
-		"encoding/csv")
+		"os"
+		"io"
+		"bufio"
+		"encoding/csv"
+		"strconv")
 
 /*
 Functions:
@@ -15,18 +19,22 @@ Functions:
 6 - hull(pList)
  */
 
-func readInData(filename string) {
-	r := csv.NewReader(strings.NewReader(filename))
+func readInData(filename string) []Point {
+	csvFile, _ := os.Open(filename)
+	reader := csv.NewReader(bufio.NewReader(csvFile))
+	var points []Point
 	for {
-		point,err := r.read()
+		line,err := reader.Read()
 		if err == io.EOF {
 			break
 		} else if err != nil {
 			fmt.Println(err)
-		} else {
-			fmt.Println(point)
 		}
+		x,_ := strconv.ParseFloat(line[0],64)
+		y,_ := strconv.ParseFloat(line[1],64)
+		points = append(points, Point{x,y})
 	}
+	return points
 }
 
 
@@ -89,6 +97,9 @@ func main() {
 	fmt.Println("VxW: ",cross(v,w))
 	o := Point{0,0}
 	fmt.Println("A is left of B around origin: ",isLeft(a,b,o))
-	fn := "../points.txt"
-	readInData(fn)
+	fn := "points.txt"
+	pointArr := readInData(fn)
+	for i,v := range pointArr {
+		fmt.Println("pointArr [",i,"] = ",v.X,v.Y)
+	}
 }
