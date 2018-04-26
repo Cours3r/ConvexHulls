@@ -19,7 +19,7 @@ def getNormalArr(mu,sigma,size):
 
 def main():
 	m = 0
-	sd = 8
+	sd = 15
 	if len(sys.argv) > 1:
 		s = int(sys.argv[1])
 	else:
