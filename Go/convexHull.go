@@ -6,20 +6,8 @@ import ("fmt"
 		"io"
 		"bufio"
 		"encoding/csv"
-		"strconv")
-
-/*
-Functions:
-
-1 x GetVec(a,b) // return a -> b
-2 x Mag(v) // return magnitude
-3 x Cross(v1,v2) // return v1[0]*v2[1] - v1[1]*v2[0]
-4 x IsLeft(a,b,origin)
-5 x ReadInData(filename)
-6 - sortByAngle(pList,origin)
-7 - hull(pList)
-8 - ccw(a,b,c)
- */
+		"strconv"
+		"time")
 
 type Point struct {
 	X float64
@@ -127,45 +115,47 @@ func SortByAngle(points []Point, origin Point) []Point {
 	return sortedPoints
 }
 
-/*
-		left := false
-		spot := -1
-		for left != true {
-			spot++
-			if spot > len(sortedPoints)-1 {
-				*left = true
-			} else {
-				*left = IsLeft(v,sortedPoints[spot],origin)
-			}
-		sortedPoints = append(sortedPoints,tmp)
-		copy(sortedPoints[spot+1:],sortedPoints[spot:])
-		sortedPoints[spot] = v
+func Ccw(p,c,n Point) bool {
+	v1 := GetVec(p,c)
+	v2 := GetVec(p,n)
+	if Cross(v1,v2) >= 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func HullPath(points []Point, start Point) ([]Point,[]int) {
+	path := []Point{start,points[0],points[1]}
+	out := []int{0,1}
+	points = points[2:]
+	if !Ccw(path[0],path[1],path[2]) {
+		path = path[:2]
+		out = out[:1]
+	}
+	for i,v := range points {
+		path = append(path,v)
+		out = append(out,i+2)
+		for !Ccw(path[len(path)-3],path[len(path)-2],path[len(path)-1]) {
+			path = append(path[:len(path)-2],path[len(path)-1])
+			out = append(out[:len(out)-2],out[len(out)-1])
 		}
- */
+	}
+	return path, out
+}
 
 func main() {
-	a := Point{1,2}
-	b := Point{5,6}
-	c := Point{-5,4}
-	//fmt.Println("Point A: ",a)
-	//fmt.Println("Point B: ",b)
-	v := GetVec(a,b)
-	//fmt.Println("Vector V: <",v.i,v.j,">")
-	//fmt.Println("Magnitude of V: ",Mag(v))
-	w := GetVec(a,c)
-	//fmt.Println("Vector W: <",w.i,w.j,">")
-	fmt.Println("VxW: ",Cross(v,w))
-	//o := Point{0,0}
-	//fmt.Println("A is left of B around origin: ",IsLeft(a,b,o))
-	fn := "points.txt"
-	pointArr := ReadInData(fn)
-	for i,v := range pointArr {
-		fmt.Println("pointArr [",i,"] = ",v.X,v.Y)
-	}
-	pointArr,base := GetLowestY(pointArr)
-	sortedPointArr := SortByAngle(pointArr,base)
-	fmt.Println("Start = ",base.X,base.Y)
-	for j,w := range sortedPointArr {
-		fmt.Println("pointArr [",j,"] = ",w.X,w.Y)
-	}
+	fn := "points.txt" //Default filename
+	pointArr := ReadInData(fn) //get data from file
+	pointArr,base := GetLowestY(pointArr) //find starting point
+	sortedPointArr := SortByAngle(pointArr,base) //sort data
+	tic := time.Now()
+	_, intPath := HullPath(sortedPointArr,base) // get the hull path and the number path
+	toc := time.Now()
+	diff := toc.Sub(tic)
+	//fmt.Println(complexHull) //Print complex hull path points
+	fmt.Println("Path: start +",intPath) //print number of the points on the path
+	fmt.Println("Length: ",len(intPath)+1)
+	fmt.Println("Time (s): ",diff.Seconds())
+	fmt.Println("Time (ns): ",diff.Nanoseconds())
 }

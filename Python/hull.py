@@ -1,6 +1,6 @@
 # @author Benjamin Stewart
 
-import math, time
+import math, time, csv, sys
 import matplotlib.pyplot as plt
 from random import randint
 import numpy.random as npr
@@ -17,6 +17,21 @@ def mag(v):
 
 def cross(v1,v2):
 	return v1[0]*v2[1] - v1[1]*v2[0]
+
+def getLowestY(points):
+	## Get start point, lowest y and corresponding x
+	start = points[0]
+	ind = 0
+	for i in range(1,len(points)):
+		if points[i][1] < start[1]:
+			start = points[i]
+			ind = i
+		elif points[i][1] == start[1]:
+			if points[i][0] < start[0]:
+				start = points[i]
+				ind = i
+	points.pop(ind)
+	return (points, start)
 
 def isleft(a,b,origin):
 	# test if a is to the left of b
@@ -58,18 +73,7 @@ def ccw(p,c,n):
 		return False
 
 def hull(points):
-	## Get start point, lowest y and corresponding x
-	start = points[0]
-	ind = 0
-	for i in range(1,len(points)):
-		if points[i][1] < start[1]:
-			start = points[i]
-			ind = i
-		elif points[i][1] == start[1]:
-			if points[i][0] < start[0]:
-				start = points[i]
-				ind = i
-	points.pop(ind)
+	points,start = getLowestY(points)
 	## Sort by polar angle
 	angleSorted = sortByAngle(points,start)
 	storage = angleSorted.copy()
@@ -82,12 +86,6 @@ def hull(points):
 		while not ccw(path[-3],path[-2],path[-1]):
 			path.pop(-2)
 	return path,start,storage
-
-
-def genPoint(low,high):
-	x = randint(low,high)
-	y = randint(low,high)
-	return (x,y)
 
 def genPointArr(low,high,size):
 	pointArr = []
@@ -102,16 +100,7 @@ def getNormalArr(mu,sigma,size):
 		out.append((coord[0],coord[1]))
 	return out
 
-def main():
-	m = 0
-	sd = 8
-	s = 125
-	arr = getNormalArr(m,sd,s)
-	tic = time.time()
-	outSidePath,origin,storage = hull(arr)
-	## Calculate time taken
-	elapsed = time.time() - tic
-	## Draw the diagram
+def drawGraph(storage,outSidePath,origin):
 	chart = plt.figure()
 	plt.axhline(0,color="black",linewidth=.5)
 	plt.axvline(0,color="black",linewidth=.5)
@@ -130,7 +119,29 @@ def main():
 		else:
 			j = i+1
 		plt.plot([outSidePath[i][0],outSidePath[j][0]],[outSidePath[i][1],outSidePath[j][1]],marker="^")
+	return pathInd
 
+def main():
+	m = 0
+	sd = 8
+	s = 125
+	#arr = getNormalArr(m,sd,s)
+	if len(sys.argv) > 1:
+		pointFile = sys.argv[1]
+	else:
+		pointFile = "points.txt"
+	arr = []
+	with open(pointFile,"r") as f:
+		reader = csv.reader(f)
+		for row in reader:
+			arr.append((float(row[0]),float(row[1])))
+
+	tic = time.time()
+	outSidePath,origin,storage = hull(arr)
+	## Calculate time taken
+	elapsed = time.time() - tic
+	## Draw the diagram
+	pathInd = drawGraph(storage,outSidePath,origin)
 	## Report Results
 	print("PathInd: ",pathInd)
 	print("Length: ",len(pathInd))

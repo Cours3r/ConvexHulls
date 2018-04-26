@@ -2,9 +2,7 @@
 # generate an array of 100 random x,y points
 from random import randint
 import numpy.random as npr
-
-num = 75
-filename = "points.txt"
+import sys
 
 def genPointArr(size):
 	pointArr = []
@@ -22,8 +20,12 @@ def getNormalArr(mu,sigma,size):
 def main():
 	m = 0
 	sd = 8
-	s = 5
+	if len(sys.argv) > 1:
+		s = int(sys.argv[1])
+	else:
+		s = 50
 	arr = getNormalArr(m,sd,s)
+	filename = "points.txt"
 	with open(filename,"w") as f:
 		for p in arr:
 			f.write("{0},{1}\n".format(p[0],p[1]))

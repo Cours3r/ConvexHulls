@@ -4,8 +4,16 @@ Convex hull algorithms written in different languages. This is a little project 
 
 ## Status
 - [x] Python
-- [ ] Go
+- [x] Golang
 - [ ] C++
+
+## Notes
+
+The python script is not nearly as fast as the Go program, but it does plot all the points and the hull, which is very useful. The plot displayed using matplotlib, and is kinda slow. The calling the python script followed by the file name, `python hull.py points.txt`, one can import data points into the script.
+
+The golang program is much faster than the python script, and analyzes a file. The default is points.txt. It can also take a command line arguement to choose the file; `goHull points.txt`. 
+
+There is a python scipt included called pointGen.py which can be used to generate a file with a variable amount of points easily. `python pointGen.py 500` will generater a file of 500 random points. As a default the script buids a file with 50 points. There are plans to further build out this script to allow easy adjustment of mean, standard distrobution, and file name.
 
 ## Resources
 
