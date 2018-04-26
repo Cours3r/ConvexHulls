@@ -140,6 +140,10 @@ def main():
 	outSidePath,origin,storage = hull(arr)
 	## Calculate time taken
 	elapsed = time.time() - tic
+	pathInd = ['start']
+	for i in range(0,len(storage)):
+		if storage[i] in outSidePath:
+			pathInd.append(i)
 	## Draw the diagram
 	pathInd = drawGraph(storage,outSidePath,origin)
 	## Report Results
