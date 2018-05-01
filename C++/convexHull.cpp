@@ -1,4 +1,5 @@
-/* C++ Convex Hull Algorithm
+/*
+ * C++ Convex Hull Algorithm
  * @author Benjamin Stewart
  */
 
@@ -7,39 +8,63 @@
 #include <iostream>
 using namespace std;
 
-/**
- * Functions to inpliment:
- *
- * 1 - getVec(a,b)
- * 		return vector a -> b
- * 2 - isLeft(a,b,origin)
- * 		return True if is a is left of b
- * 3 - sortByAngle(pList,origin)
- * 		return sorted array?
- * 4 - ccw(p,c,n)
- * 		return if p,c,n is ccw
- * 5 - hull(pList):
- * 		return vector (or array) or hull points
- */
+struct point {
+	float x;
+	float y;
+};
 
-float mag(vector<float> v) {
-	return sqrt(pow(v[0],2) + pow(v[1],2));
+struct vec {
+	float i;
+	float j;
+};
+
+float mag(vec v) {
+	return sqrt(pow(v.i,2) + pow(v.j,2));
 }
 
-float cross(vector<float> v1, vector<float> v2) {
-	return (v1[0]*v2[1] - v1[1]*v2[0]);
+float cross(vec v1, vec v2) {
+	return (v1.i*v2.j - v1.j*v2.i);
 }
 
-vector<float> getVec(vector<float> a, vector<float> b) {
-	float x = b[0] - a[0];
-	float y = b[1] - a[1];
-	vector<float> v;
-	v.push_back(x);
-	v.push_back(y);
+vec getVec(point a, point b) {
+	float icomp = b.x - a.x;
+	float jcomp = b.y - a.y;
+	vec v = {icomp,jcomp};
 	return v;
 }
 
+bool isLeft(point a, point b, point origin) {
+	vec v1 = getVec(origin,a);
+	vec v2 = getVec(origin,b);
+	float crossProd = cross(v1,v2);
+	if (crossProd > 0) {
+		return false;
+	} else if (crossProd < 0) {
+		return true;
+	} else {
+		if (mag(v1) > mag(v2)) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+}
+
+
+
 int main() {
-	vector<float> vec1;
+	point A = {1.0,2.0};
+	point B = {4.0,9.0};
+	point org = {0.0,0.0};
+	cout << "A: <" << A.x << ", " << A.y << ">" << endl;
+	cout << "B: <" << B.x << ", " << B.y << ">" << endl;
+	vec v1 = getVec(A,B);
+	cout << "v1: " << v1.i << ", " << v1.j << endl;
+	cout << "A is left of B: ";
+	if ((isLeft(A,B,org))) {
+		cout << "True" << endl;
+	} else {
+		cout << "False" << endl;
+	}
 	return 0;
 }
